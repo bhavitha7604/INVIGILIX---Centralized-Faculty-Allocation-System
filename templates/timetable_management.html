@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Management</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>Exam Portal</h2>
+    <p class="sidebar-subtitle">Admin Panel</p>
+
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('faculty_management') }}">Faculty Management</a>
+    <a href="{{ url_for('timetable_management') }}" class="active">Timetable Management</a>
+    <a href="{{ url_for('examination_management') }}">Examination Management</a>
+    <a href="{{ url_for('hall_management') }}">Hall Management</a>
+    <a href="{{ url_for('duty_allocation') }}">Duty Allocation</a>
+    <a href="#">Reports</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+<div class="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1>Timetable Management</h1>
+            <p>Manage faculty class schedules and availability.</p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="content-card">
+
+        <h2>Add Timetable Entry</h2>
+
+        <form method="POST"
+              action="{{ url_for('timetable_management') }}"
+              id="timetableForm">
+
+            <div class="form-grid">
+
+                <!-- Search and Select Faculty -->
+                <div class="form-group">
+
+                    <label for="facultySearch">Select Faculty</label>
+
+                    <div class="faculty-dropdown">
+
+                        <input
+                            type="text"
+                            id="facultySearch"
+                            placeholder="Type faculty name to search..."
+                            autocomplete="off"
+                            required
+                        >
+
+                        <input
+                            type="hidden"
+                            name="faculty_id"
+                            id="facultyId"
+                        >
+
+                        <div id="facultyResults" class="faculty-results">
+
+                            {% for faculty in faculty_list %}
+                            <div
+                                class="faculty-option"
+                                data-id="{{ faculty.id }}"
+                                data-name="{{ faculty.name }}"
+                            >
+                                {{ faculty.name }}
+                            </div>
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label>Day</label>
+
+                    <select name="day" required>
+                        <option value="">Select Day</option>
+                        <option>Monday</option>
+                        <option>Tuesday</option>
+                        <option>Wednesday</option>
+                        <option>Thursday</option>
+                        <option>Friday</option>
+                        <option>Saturday</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Subject</label>
+
+                    <input
+                        type="text"
+                        name="subject"
+                        placeholder="Enter subject name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Semester</label>
+
+                    <input
+                        type="text"
+                        name="semester"
+                        placeholder="Enter semester"
+                        required
+                    >
+                </div>
+
+                <!-- AM/PM Start Time -->
+                <div class="form-group">
+                    <label>Start Time</label>
+
+                    <input
+                        type="text"
+                        name="start_time"
+                        placeholder="09:00 AM"
+                        pattern="(0[1-9]|1[0-2]):[0-5][0-9] [AaPp][Mm]"
+                        title="Enter time like 09:00 AM"
+                        required
+                    >
+
+                    <p class="time-note">Example: 09:00 AM</p>
+                </div>
+
+                <!-- AM/PM End Time -->
+                <div class="form-group">
+                    <label>End Time</label>
+
+                    <input
+                        type="text"
+                        name="end_time"
+                        placeholder="04:00 PM"
+                        pattern="(0[1-9]|1[0-2]):[0-5][0-9] [AaPp][Mm]"
+                        title="Enter time like 04:00 PM"
+                        required
+                    >
+
+                    <p class="time-note">Example: 04:00 PM</p>
+                </div>
+
+            </div>
+
+            <button type="submit" class="primary-btn">
+                Add Timetable
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="content-card">
+
+        <h2>Faculty Timetable Records</h2>
+
+        <div class="table-container">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faculty Name</th>
+                        <th>Day</th>
+                        <th>Subject</th>
+                        <th>Semester</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in timetable_list %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.day }}</td>
+                        <td>{{ item.subject }}</td>
+                        <td>{{ item.semester }}</td>
+                        <td>{{ item.start_time | time12 }}</td>
+                        <td>{{ item.end_time | time12 }}</td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="6">No timetable entries found.</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const facultySearch = document.getElementById("facultySearch");
+    const facultyId = document.getElementById("facultyId");
+    const facultyResults = document.getElementById("facultyResults");
+    const timetableForm = document.getElementById("timetableForm");
+
+    const allFaculty = Array.from(
+        document.querySelectorAll(".faculty-option")
+    ).map(option => ({
+        id: option.dataset.id,
+        name: option.dataset.name
+    }));
+
+    function showFacultyResults() {
+
+        const searchText = facultySearch.value.trim().toLowerCase();
+
+        facultyResults.innerHTML = "";
+        facultyResults.style.display = "block";
+
+        const matches = allFaculty.filter(faculty =>
+            faculty.name.toLowerCase().includes(searchText)
+        );
+
+        if (matches.length === 0) {
+            const emptyMessage = document.createElement("div");
+            emptyMessage.className = "no-faculty";
+            emptyMessage.textContent = "No faculty found";
+            facultyResults.appendChild(emptyMessage);
+            return;
+        }
+
+        matches.forEach(faculty => {
+
+            const option = document.createElement("div");
+
+            option.className = "faculty-option";
+            option.textContent = faculty.name;
+
+            option.addEventListener("click", function () {
+                facultySearch.value = faculty.name;
+                facultyId.value = faculty.id;
+                facultySearch.setCustomValidity("");
+                facultyResults.style.display = "none";
+            });
+
+            facultyResults.appendChild(option);
+        });
+    }
+
+    facultySearch.addEventListener("input", function () {
+
+        facultyId.value = "";
+
+        facultySearch.setCustomValidity(
+            "Please select a faculty member from the suggestions."
+        );
+
+        showFacultyResults();
+    });
+
+    facultySearch.addEventListener("focus", showFacultyResults);
+
+    document.addEventListener("click", function (event) {
+
+        if (!event.target.closest(".faculty-dropdown")) {
+            facultyResults.style.display = "none";
+        }
+
+    });
+
+    timetableForm.addEventListener("submit", function (event) {
+
+        if (!facultyId.value) {
+            event.preventDefault();
+
+            facultySearch.setCustomValidity(
+                "Please select a faculty member from the suggestions."
+            );
+
+            facultySearch.reportValidity();
+            facultySearch.focus();
+        }
+
+    });
+</script>
+
+</body>
+</html>

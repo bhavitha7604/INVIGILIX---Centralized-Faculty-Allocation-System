@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>Exam Portal</h2>
+    <p class="sidebar-subtitle">Admin Panel</p>
+
+    <a href="{{ url_for('admin_dashboard') }}" class="active">
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('faculty_management') }}">
+        Faculty Management
+    </a>
+
+    <a href="{{ url_for('timetable_management') }}">
+        Timetable Management
+    </a>
+
+    <a href="{{ url_for('examination_management') }}">
+        Examination Management
+    </a>
+
+    <a href="{{ url_for('hall_management') }}">
+        Hall Management
+    </a>
+
+    <!-- UPDATED DUTY ALLOCATION LINK -->
+    <a href="{{ url_for('duty_allocation') }}">
+        Duty Allocation
+    </a>
+
+    <a href="{{ url_for('reports') }}">
+        Reports
+    </a>
+
+    <a href="{{ url_for('logout') }}">
+        Logout
+    </a>
+
+</div>
+
+
+<div class="main-content">
+
+    <div class="page-header">
+
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>Welcome to the Examination Management System.</p>
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-cards">
+
+        <div class="card">
+            <h3>Total Faculty</h3>
+            <h2>{{ faculty_count }}</h2>
+        </div>
+
+        <div class="card">
+            <h3>Timetable Entries</h3>
+            <h2>{{ timetable_count }}</h2>
+        </div>
+
+        <div class="card">
+            <h3>Examination Halls</h3>
+            <h2>{{ hall_count|default(0) }}</h2>
+        </div>
+
+        <div class="card">
+            <h3>Assigned Duties</h3>
+            <h2>{{ duty_count|default(0) }}</h2>
+        </div>
+
+    </div>
+
+
+    <div class="content-card">
+
+        <h2>Recently Added Faculty</h2>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for faculty in recent_faculty %}
+
+                    <tr>
+                        <td>{{ faculty.name }}</td>
+                        <td>{{ faculty.department }}</td>
+                        <td>{{ faculty.email }}</td>
+                        <td>{{ faculty.phone }}</td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="4">
+                            No faculty records available.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

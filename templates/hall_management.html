@@ -1,0 +1,349 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hall Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            color: #17365d;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .hall-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+            border-left: 4px solid #376da5;
+        }
+
+        .stat-card p {
+            color: #718096;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card h2 {
+            color: #17365d;
+            font-size: 27px;
+            margin: 0;
+        }
+
+        .hall-card {
+            background: #ffffff;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+        }
+
+        .hall-card h2 {
+            color: #17365d;
+            font-size: 19px;
+            margin-bottom: 22px;
+        }
+
+        .hall-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #34445a;
+        }
+
+        .form-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1px solid #d5dce5;
+            border-radius: 7px;
+            background: #fff;
+            font-size: 14px;
+            color: #263445;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #376da5;
+            box-shadow: 0 0 0 3px rgba(55,109,165,0.10);
+        }
+
+        .hall-submit {
+            margin-top: 25px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 7px;
+            background: #173f68;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .hall-submit:hover {
+            background: #245783;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .hall-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 550px;
+        }
+
+        .hall-table th {
+            background: #edf2f8;
+            color: #17365d;
+            padding: 15px 12px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .hall-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e8edf3;
+            color: #44546a;
+            font-size: 13px;
+        }
+
+        .hall-table tr:hover td {
+            background: #f8fafd;
+        }
+
+        .capacity-badge {
+            background: #e8f2fc;
+            color: #245783;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 25px !important;
+            color: #8995a5 !important;
+        }
+
+        .flash {
+            padding: 12px 15px;
+            margin-bottom: 18px;
+            border-radius: 7px;
+        }
+
+        .flash.success {
+            background: #e8f7ee;
+            color: #247443;
+        }
+
+        .flash.error {
+            background: #fdecec;
+            color: #b83232;
+        }
+
+        @media (max-width: 700px) {
+            .hall-form-grid,
+            .hall-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>EMS Portal</h2>
+    <p>Administrator</p>
+
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('faculty_management') }}">Faculty Management</a>
+    <a href="{{ url_for('timetable_management') }}">Timetable Management</a>
+    <a href="{{ url_for('examination_management') }}">Examination Management</a>
+    <a href="{{ url_for('hall_management') }}" class="active">Hall Management</a>
+    <a href="{{ url_for('duty_allocation') }}">Duty Allocation</a>
+    <a href="#">Reports</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+<div class="main-content">
+
+    <div class="page-header">
+        <h1>Hall Management</h1>
+        <p>Add and manage examination halls and their seating capacity.</p>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- HALL STATISTICS -->
+
+    <div class="hall-stats">
+
+        <div class="stat-card">
+            <p>Total Registered Halls</p>
+            <h2>{{ hall_list|length }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Total Seating Capacity</p>
+            <h2>{{ hall_list|sum(attribute='seating_capacity') }}</h2>
+        </div>
+
+    </div>
+
+    <!-- ADD HALL FORM -->
+
+    <div class="hall-card">
+
+        <h2>Add New Examination Hall</h2>
+
+        <form method="POST"
+              action="{{ url_for('hall_management') }}">
+
+            <div class="hall-form-grid">
+
+                <div class="form-group">
+                    <label>Hall Number</label>
+                    <input
+                        type="text"
+                        name="hall_number"
+                        placeholder="Example: H101"
+                        maxlength="30"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Building Name</label>
+                    <input
+                        type="text"
+                        name="building_name"
+                        placeholder="Example: Main Block"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Seating Capacity</label>
+                    <input
+                        type="number"
+                        name="seating_capacity"
+                        placeholder="Enter number of seats"
+                        min="1"
+                        max="10000"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <button type="submit" class="hall-submit">
+                + Add Hall
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- HALL RECORDS -->
+
+    <div class="hall-card">
+
+        <h2>Registered Examination Halls</h2>
+
+        <div class="table-wrapper">
+
+            <table class="hall-table">
+
+                <thead>
+                    <tr>
+                        <th>Sl. No.</th>
+                        <th>Hall Number</th>
+                        <th>Building Name</th>
+                        <th>Seating Capacity</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for hall in hall_list %}
+
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ hall['hall_number'] }}</td>
+                        <td>{{ hall['building_name'] }}</td>
+                        <td>
+                            <span class="capacity-badge">
+                                {{ hall['seating_capacity'] }} Seats
+                            </span>
+                        </td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="4" class="empty-message">
+                            No examination halls registered yet.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
+```

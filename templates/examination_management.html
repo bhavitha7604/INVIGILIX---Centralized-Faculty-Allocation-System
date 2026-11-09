@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Examination Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <h2>Exam Portal</h2>
+    <p class="sidebar-subtitle">Admin Panel</p>
+
+    <a href="{{ url_for('admin_dashboard') }}">
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('faculty_management') }}">
+        Faculty Management
+    </a>
+
+    <a href="{{ url_for('timetable_management') }}">
+        Timetable Management
+    </a>
+
+    <a href="{{ url_for('examination_management') }}" class="active">
+        Examination Management
+    </a>
+
+    <a href="{{ url_for('hall_management') }}">
+        Hall Management
+    </a>
+
+    <a href="{{ url_for('duty_allocation') }}">
+        Duty Allocation
+    </a>
+
+    <a href="#">
+        Reports
+    </a>
+
+    <a href="{{ url_for('logout') }}">
+        Logout
+    </a>
+
+</div>
+
+
+<!-- MAIN CONTENT -->
+
+<div class="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1>Examination Management</h1>
+            <p>Schedule and manage college examinations.</p>
+        </div>
+    </div>
+
+
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- ADD EXAMINATION FORM -->
+
+    <div class="content-card">
+
+        <h2>Add Examination</h2>
+
+        <form method="POST"
+              action="{{ url_for('examination_management') }}">
+
+            <div class="form-grid">
+
+                <!-- EXAM NAME -->
+
+                <div class="form-group">
+
+                    <label>Examination Name</label>
+
+                    <input
+                        type="text"
+                        name="exam_name"
+                        placeholder="Enter examination name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- SUBJECT -->
+
+                <div class="form-group">
+
+                    <label>Subject</label>
+
+                    <input
+                        type="text"
+                        name="subject"
+                        placeholder="Enter subject"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- DEPARTMENT -->
+
+                <div class="form-group">
+
+                    <label>Department</label>
+
+                    <input
+                        type="text"
+                        name="department"
+                        placeholder="Enter department"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- SEMESTER -->
+
+                <div class="form-group">
+
+                    <label>Semester</label>
+
+                    <input
+                        type="text"
+                        name="semester"
+                        placeholder="Example: 5th Semester"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- STUDENT COUNT -->
+
+                <div class="form-group">
+
+                    <label>Number of Students</label>
+
+                    <input
+                        type="number"
+                        name="student_count"
+                        placeholder="Enter number of students"
+                        min="1"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- EXAM DATE -->
+
+                <div class="form-group">
+
+                    <label>Examination Date</label>
+
+                    <input
+                        type="date"
+                        name="exam_date"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- START TIME -->
+
+                <div class="form-group">
+
+                    <label>Start Time</label>
+
+                    <input
+                        type="text"
+                        name="start_time"
+                        placeholder="09:00 AM"
+                        pattern="(0[1-9]|1[0-2]):[0-5][0-9] [AaPp][Mm]"
+                        title="Enter time like 09:00 AM"
+                        required
+                    >
+
+                    <p class="time-note">
+                        Example: 09:00 AM
+                    </p>
+
+                </div>
+
+
+                <!-- END TIME -->
+
+                <div class="form-group">
+
+                    <label>End Time</label>
+
+                    <input
+                        type="text"
+                        name="end_time"
+                        placeholder="12:00 PM"
+                        pattern="(0[1-9]|1[0-2]):[0-5][0-9] [AaPp][Mm]"
+                        title="Enter time like 12:00 PM"
+                        required
+                    >
+
+                    <p class="time-note">
+                        Example: 12:00 PM
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUBMIT BUTTON -->
+
+            <button type="submit" class="primary-btn">
+                Add Examination
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- EXAMINATION RECORDS -->
+
+    <div class="content-card">
+
+        <h2>Examination Records</h2>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Exam Name</th>
+                        <th>Subject</th>
+                        <th>Department</th>
+                        <th>Semester</th>
+                        <th>Student Count</th>
+                        <th>Exam Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for exam in exam_list %}
+
+                    <tr>
+
+                        <td>{{ exam['exam_name'] }}</td>
+
+                        <td>{{ exam['subject'] }}</td>
+
+                        <td>{{ exam['department'] }}</td>
+
+                        <td>{{ exam['semester'] }}</td>
+
+                        <td>{{ exam['student_count'] }}</td>
+
+                        <td>{{ exam['exam_date'] }}</td>
+
+                        <td>{{ exam['start_time'] | time12 }}</td>
+
+                        <td>{{ exam['end_time'] | time12 }}</td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+
+                        <td colspan="8" style="text-align: center;">
+                            No examinations scheduled yet.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

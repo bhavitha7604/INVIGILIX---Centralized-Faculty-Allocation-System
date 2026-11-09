@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examination Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="home-page">
+
+    <nav class="home-navbar">
+        <div class="brand">
+            <div class="brand-icon">EMS</div>
+            Examination Management System
+        </div>
+    </nav>
+
+    <main class="home-hero">
+
+        <span class="hero-tag">COLLEGE EXAMINATION PORTAL</span>
+
+        <h1>Smart Examination<br>Hall Management System</h1>
+
+        <p>
+            A centralized platform to manage faculty timetables,
+            examination schedules, invigilator allocation and
+            examination-related activities efficiently.
+        </p>
+
+        <div class="portal-grid">
+
+            <div class="portal-card">
+                <div class="brand-icon">A</div>
+
+                <h2>Administrator Portal</h2>
+
+                <p>
+                    Manage faculty records, timetables,
+                    examination schedules and invigilator allocation.
+                </p>
+
+                <a href="{{ url_for('login', role='admin') }}"
+                   class="btn">
+                    Admin Login →
+                </a>
+            </div>
+
+            <div class="portal-card">
+                <div class="brand-icon">F</div>
+
+                <h2>Faculty Portal</h2>
+
+                <p>
+                    Access your faculty profile, class timetable
+                    and assigned examination duties.
+                </p>
+
+                <a href="{{ url_for('login', role='faculty') }}"
+                   class="btn">
+                    Faculty Login →
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
