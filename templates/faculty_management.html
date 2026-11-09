@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Management</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>Exam Portal</h2>
+    <p class="sidebar-subtitle">Admin Panel</p>
+
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('faculty_management') }}" class="active">Faculty Management</a>
+    <a href="{{ url_for('timetable_management') }}">Timetable Management</a>
+    <a href="{{ url_for('examination_management') }}">Examination Management</a>
+    <a href="{{ url_for('hall_management') }}">Hall Management</a>
+    <a href="{{ url_for('duty_allocation') }}">Duty Allocation</a>
+    <a href="#">Reports</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+<div class="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1>Faculty Management</h1>
+            <p>Add and manage faculty details.</p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="content-card">
+
+        <h2>Add New Faculty</h2>
+
+        <form action="{{ url_for('add_faculty') }}" method="POST">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Faculty Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Enter faculty name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Department</label>
+                    <input
+                        type="text"
+                        name="department"
+                        placeholder="Enter department"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter email address"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input
+                        type="tel"
+                        name="phone"
+                        placeholder="Enter phone number"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Create username"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Create password"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn">
+                Add Faculty
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="content-card">
+
+        <h2>Faculty Records</h2>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for faculty in faculty_list %}
+                    <tr>
+                        <td>{{ faculty.id }}</td>
+                        <td>{{ faculty.name }}</td>
+                        <td>{{ faculty.department }}</td>
+                        <td>{{ faculty.email }}</td>
+                        <td>{{ faculty.phone }}</td>
+                        <td>{{ faculty.username }}</td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="6">No faculty records found.</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

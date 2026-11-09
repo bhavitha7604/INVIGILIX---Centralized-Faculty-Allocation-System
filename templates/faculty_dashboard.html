@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Faculty Dashboard | EMS</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-icon">EMS</div>
+
+            <div>
+                <h2>EMS Portal</h2>
+                <p>Faculty</p>
+            </div>
+
+        </div>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <a href="{{ url_for('faculty_dashboard') }}" class="active">
+            Dashboard
+        </a>
+
+        <a href="#profile">My Profile</a>
+        <a href="#timetable">My Timetable</a>
+        <a href="#duties">Examination Duties</a>
+
+        <a href="#notifications">
+            Notifications
+            {% if unread_notification_count > 0 %}
+                ({{ unread_notification_count }})
+            {% endif %}
+        </a>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <!-- HEADER -->
+
+        <div class="page-header">
+
+            <div>
+                <h1>Faculty Dashboard</h1>
+                <p>Welcome back, {{ faculty.name }}!</p>
+            </div>
+
+        </div>
+
+
+        <!-- DASHBOARD STATISTICS -->
+
+        <div class="dashboard-cards">
+
+            <div class="dash-card">
+                <h3>Faculty ID</h3>
+                <h2>{{ faculty.id }}</h2>
+            </div>
+
+            <div class="dash-card">
+                <h3>Department</h3>
+                <h2 style="font-size: 19px;">
+                    {{ faculty.department }}
+                </h2>
+            </div>
+
+            <div class="dash-card">
+                <h3>Timetable Entries</h3>
+                <h2>{{ timetable|length }}</h2>
+            </div>
+
+            <div class="dash-card">
+                <h3>Total Examination Duties</h3>
+                <h2>{{ duty_count }}</h2>
+            </div>
+
+            <div class="dash-card">
+                <h3>Upcoming Duties</h3>
+                <h2>{{ upcoming_duty_count }}</h2>
+            </div>
+
+            <div class="dash-card">
+                <h3>Unread Notifications</h3>
+                <h2>{{ unread_notification_count }}</h2>
+            </div>
+
+        </div>
+
+
+        <!-- FACULTY PROFILE -->
+
+        <div class="content-card" id="profile">
+
+            <h2>My Profile</h2>
+
+            <div class="profile-grid">
+
+                <div class="profile-item">
+                    <label>Faculty Name</label>
+                    <strong>{{ faculty.name }}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <label>Faculty ID</label>
+                    <strong>{{ faculty.id }}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <label>Department</label>
+                    <strong>{{ faculty.department }}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <label>Email Address</label>
+                    <strong>{{ faculty.email }}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <label>Phone Number</label>
+                    <strong>{{ faculty.phone }}</strong>
+                </div>
+
+                <div class="profile-item">
+                    <label>Username</label>
+                    <strong>{{ faculty.username }}</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACADEMIC TIMETABLE -->
+
+        <div class="content-card" id="timetable">
+
+            <h2>My Academic Timetable</h2>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Subject</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Semester</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in timetable %}
+
+                        <tr>
+
+                            <td>{{ item.day }}</td>
+
+                            <td>{{ item.subject }}</td>
+
+                            <td>{{ item.start_time | time12 }}</td>
+
+                            <td>{{ item.end_time | time12 }}</td>
+
+                            <td>{{ item.semester }}</td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="5">
+                                No timetable entries assigned yet.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- EXAMINATION DUTIES -->
+
+        <div class="content-card" id="duties">
+
+            <h2>My Examination Duties</h2>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Examination</th>
+                            <th>Subject</th>
+                            <th>Department</th>
+                            <th>Semester</th>
+                            <th>Date</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Hall</th>
+                            <th>Building</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for duty in duties %}
+
+                        <tr>
+
+                            <td>{{ duty.exam_name }}</td>
+
+                            <td>{{ duty.subject }}</td>
+
+                            <td>{{ duty.department }}</td>
+
+                            <td>{{ duty.semester }}</td>
+
+                            <td>{{ duty.duty_date }}</td>
+
+                            <td>{{ duty.start_time | time12 }}</td>
+
+                            <td>{{ duty.end_time | time12 }}</td>
+
+                            <td>{{ duty.hall_number }}</td>
+
+                            <td>{{ duty.building_name }}</td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="9">
+                                No examination duties assigned yet.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- NOTIFICATIONS -->
+
+        <div class="content-card" id="notifications">
+
+            <h2>Notifications</h2>
+
+            <p>
+                You have
+                <strong>{{ unread_notification_count }}</strong>
+                unread notification(s).
+            </p>
+
+            {% if notifications %}
+
+                {% for notification in notifications %}
+
+                    <div class="notification-card">
+
+                        <div class="notification-header">
+
+                            <strong>
+                                {% if notification['is_read'] == 0 %}
+                                    New Notification
+                                {% else %}
+                                    Notification
+                                {% endif %}
+                            </strong>
+
+                            <span>
+                                {{ notification['created_at'] }}
+                            </span>
+
+                        </div>
+
+                        <p>
+                            {{ notification['message'] }}
+                        </p>
+
+                        {% if notification['is_read'] == 0 %}
+
+                            <form
+                                action="{{ url_for('mark_notification_read', notification_id=notification['id']) }}"
+                                method="POST">
+
+                                <button type="submit">
+                                    Mark as Read
+                                </button>
+
+                            </form>
+
+                        {% else %}
+
+                            <span class="notification-read">
+                                Read
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No notifications available.</p>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
